@@ -75,8 +75,10 @@ async function boot(){
   $('#puzzleTitle').innerHTML = `No. ${P.no}<br>${nice(P.date)}`;
   if(P.date!==today && avail.includes(today)){ $('#todayBar').hidden=false; document.body.classList.add('archiveday'); }
   document.title = `Oddball No. ${P.no}`;
-  S = restore(load(P.date));
+  const raw=load(P.date); S = restore(raw);
+  if(JSON.stringify(raw)!==JSON.stringify(S)) save();
   if(S.done) showResults(); else renderRound();
+  try{ if(sessionStorage.getItem('ob-newday')){ sessionStorage.removeItem('ob-newday'); if(avail.length>1) toast("A new Oddball is out. Yesterday's is in the archive.",4000); } }catch(e){}
   window.__ob.date=P.date; window.__ob.ready=true; window.__ob.state=()=>JSON.parse(JSON.stringify(S));
 }
 
@@ -85,6 +87,7 @@ function restore(st){
   const fp=P.rounds.map(r=>r.f), n=P.rounds.length;
   const fresh={picks:Array(n).fill(null), idx:0, done:false, fp};
   if(!st || !Array.isArray(st.picks) || st.picks.length!==n || !Array.isArray(st.fp)) return fresh;
+  st=JSON.parse(JSON.stringify(st));
   let changed=false;
   st.picks=st.picks.map((p,i)=>{ const ok=st.fp[i]===fp[i] && (p===null || (Number.isInteger(p)&&p>=0&&p<4)); if(!ok&&p!==null) changed=true; return ok?p:null; });
   st.fp=fp;
@@ -112,7 +115,7 @@ function renderRound(){
     const b=document.createElement('button'); b.className='tile '+(t.img?'pic':'word'); b.dataset.k=k;
     if(t.img){ b.innerHTML=`<img src="${esc(t.img)}" alt="Picture ${k+1}" width="480" height="480" decoding="async" draggable="false"><span class="cap"></span><span class="tag"></span>`; b.setAttribute('aria-label',`Picture ${k+1}`); }
     else { b.innerHTML=`<span class="w ${wordSize(t.text)}">${esc(t.text)}</span><span class="tag"></span>`; }
-    b.addEventListener('click',()=>{ if(b.classList.contains('failed')&&S.picks[i]===null){ retryImg(b,t.img,true); return; } pick(k); });
+    b.addEventListener('click',()=>{ if(b.classList.contains('failed')&&S.picks[i]===null&&!b.dataset.manual){ b.dataset.manual='1'; retryImg(b,t.img,true); return; } pick(k); });
     if(t.img){ const im=b.querySelector('img'); im.addEventListener('error',()=>retryImg(b,t.img,false)); im.addEventListener('load',()=>b.classList.remove('failed')); }
     G.appendChild(b);
   });
@@ -186,7 +189,7 @@ function showResults(){
 // ---- sheets ----
 function open(id){ closeAll(); $(id).hidden=false; document.documentElement.classList.add('sheet-open'); }
 function closeAll(){ document.querySelectorAll('.sheet').forEach(s=>s.hidden=true); document.documentElement.classList.remove('sheet-open'); }
-let toastT; function toast(t){ const el=$('#toast'); el.textContent=t; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,1800); }
+let toastT; function toast(t,ms=1800){ const el=$('#toast'); el.textContent=t; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,ms); }
 function showArchive(){
   const L=$('#archiveList'); L.innerHTML='';
   if(!avail.length) L.innerHTML='<p style="margin:12px">No puzzles yet.</p>';
@@ -202,7 +205,7 @@ function showArchive(){
 function goDate(d){ const u=new URL(location.href); if(d===todayIso()) u.searchParams.delete('date'); else u.searchParams.set('date',d); location.href=u.toString(); }
 // 12: if the app is resumed on a new London day (and showing "today"), reload to get the new puzzle
 let bootDay=null;
-function checkNewDay(){ if(bootDay && !params.get('date') && todayIso()!==bootDay) location.reload(); }
+function checkNewDay(){ if(bootDay && !params.get('date') && todayIso()!==bootDay){ try{ sessionStorage.setItem('ob-newday','1'); }catch(e){} location.reload(); } }
 function bind(){
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkNewDay(); });
   window.addEventListener('pageshow',checkNewDay); window.addEventListener('focus',checkNewDay);

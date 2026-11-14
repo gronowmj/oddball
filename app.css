@@ -29,7 +29,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .score{min-width:56px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;color:var(--teal)}
 .prompt{margin:6px 0 10px;text-align:center;font-size:17px;font-weight:600;color:var(--ink);height:22px;line-height:22px}
 .gridwrap{display:flex;justify-content:center}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%, calc(100dvh - 320px - var(--safe-top) - var(--safe-bottom)), 520px);min-width:min(100%,250px)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%, calc(100dvh - 300px - var(--safe-top) - var(--safe-bottom)), 520px);min-width:min(100%,250px)}
 .tile{position:relative;aspect-ratio:1/1;border-radius:16px;background:var(--tile);border:0;padding:0;overflow:hidden;box-shadow:var(--shadow),inset 0 0 0 1px var(--edge);display:flex;align-items:center;justify-content:center;text-align:center;transition:transform .12s ease,box-shadow .15s ease,opacity .2s ease}
 .tile:active:not(:disabled){transform:scale(.97)}
 .tile:disabled{cursor:default}
@@ -47,12 +47,12 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .tile.word.isodd{background:var(--good-soft)}
 .tile.picked.wrong{box-shadow:var(--shadow),inset 0 0 0 4px var(--bad)}
 .tile.word.picked.wrong{background:var(--bad-soft)}
-.feedback{margin-top:10px;min-height:128px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.fbtext{height:68px;text-align:center;font-size:16px;line-height:1.35;display:flex;flex-direction:column;justify-content:center}
+.feedback{margin-top:8px;min-height:112px;gap:8px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.fbtext{height:56px;text-align:center;font-size:16px;line-height:1.35;display:flex;flex-direction:column;justify-content:center}
 .fbtext b.ok{color:var(--good);font-size:19px}.fbtext b.no{color:var(--bad);font-size:19px}
 .fbtext .hint{color:var(--muted)}
 button.primary{background:var(--teal);color:#fff;border:0;border-radius:24px;padding:11px 22px;font-weight:700;font-size:16px}
-button.big{min-width:220px;min-height:50px;font-size:17px}
+button.big{min-width:220px;min-height:48px;font-size:17px}
 button.primary:disabled{visibility:hidden}
 .rescard{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:20px 16px;text-align:center;margin-top:4px}
 .bigscore{font-size:54px;font-weight:850;font-weight:900;color:var(--teal);line-height:1}
@@ -85,7 +85,7 @@ button.primary:disabled{visibility:hidden}
 .card{background:#fff;margin:auto 18px;border-radius:16px;padding:20px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.25);line-height:1.45}
 .card h2{margin:0 0 8px;color:var(--teal)}
 .card .row{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
-.toast{position:fixed;left:50%;top:110px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:20px;font-size:14px;z-index:30}
+.toast{position:fixed;left:50%;top:110px;transform:translateX(-50%);max-width:calc(100% - 32px);text-align:center;background:var(--ink);color:#fff;padding:9px 16px;border-radius:20px;font-size:14px;z-index:30}
 html.sheet-open,html.sheet-open body{overflow:hidden}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
