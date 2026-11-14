@@ -97,7 +97,7 @@ function restore(st){
   return st;
 }
 function wordSize(t){ const n=t.length, longest=Math.max(...t.split(' ').map(w=>w.length));
-  if(n<=7 && longest<=7) return 's1'; if(n<=11 && longest<=9) return 's2'; if(n<=18 && longest<=10) return 's3'; return 's4'; }
+  if(n<=7 && longest<=7) return 's1'; if(n<=11 && longest<=9) return 's2'; if(n<=18 && longest<=9) return 's3'; return 's4'; }
 
 function renderDots(){
   const D=$('#dots'); D.innerHTML='';
