@@ -111,10 +111,12 @@ function renderRound(){
   show('#game');
   const i=S.idx, r=P.rounds[i], sec=SEC[i];
   const G=$('#grid'); G.innerHTML=''; G.classList.remove('answered');
+  // one text size per round, so no word stands out just by being longer or shorter
+  const ws=r.tiles.filter(t=>!t.img).map(t=>wordSize(t.text)).sort().pop();
   r.tiles.forEach((t,k)=>{
     const b=document.createElement('button'); b.className='tile '+(t.img?'pic':'word'); b.dataset.k=k;
     if(t.img){ b.innerHTML=`<img src="${esc(t.img)}" alt="Picture ${k+1}" width="480" height="480" decoding="async" draggable="false"><span class="cap"></span><span class="tag"></span>`; b.setAttribute('aria-label',`Picture ${k+1}`); }
-    else { b.innerHTML=`<span class="w ${wordSize(t.text)}">${esc(t.text)}</span><span class="tag"></span>`; }
+    else { b.innerHTML=`<span class="w ${ws}">${esc(t.text)}</span><span class="tag"></span>`; }
     b.addEventListener('click',()=>{ if(b.classList.contains('failed')&&S.picks[i]===null&&!b.dataset.manual){ b.dataset.manual='1'; retryImg(b,t.img,true); return; } pick(k); });
     if(t.img){ const im=b.querySelector('img'); im.addEventListener('error',()=>retryImg(b,t.img,false)); im.addEventListener('load',()=>b.classList.remove('failed')); }
     G.appendChild(b);
