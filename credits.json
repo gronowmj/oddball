@@ -43,10 +43,10 @@
 "file": "img/4b7b5eabaa7fea.webp"
 },
 {
-"source": "https://commons.wikimedia.org/wiki/File:Freddie_Mercury_performing_in_New_Haven,_CT,_November_1977_cropped.jpg",
-"author": "Carl Lender (derivative works: Lošmi, Morn)",
-"licence": "CC BY-SA 3.0",
-"file": "img/1861580467dff1.webp"
+"source": "https://commons.wikimedia.org/wiki/File:George_Michael.jpeg",
+"author": "University of Houston Digital Library",
+"licence": "Public domain",
+"file": "img/479f42f97a83e8.webp"
 },
 {
 "source": "https://commons.wikimedia.org/wiki/File:Igel.JPG",
@@ -301,16 +301,16 @@
 "file": "img/11a788ebfce876.webp"
 },
 {
-"source": "https://commons.wikimedia.org/wiki/File:Da_Vinci_Vitruve_Luc_Viatour.jpg",
-"author": "Leonardo da Vinci",
-"licence": "Public domain",
-"file": "img/d7180fce1bc865.webp"
-},
-{
 "source": "https://commons.wikimedia.org/wiki/File:Daniel_Craig_TIFF_2025_Red_Carpet_(cropped).jpg",
 "author": "Max Surprenant",
 "licence": "CC BY 4.0",
 "file": "img/8cd17282870015.webp"
+},
+{
+"source": "https://commons.wikimedia.org/wiki/File:Ewan_McGregor,_2006.jpg",
+"author": "SPakhrin",
+"licence": "CC BY 2.0",
+"file": "img/a27d975317621f.webp"
 },
 {
 "source": "https://commons.wikimedia.org/wiki/File:FDR-1944-Campaign-Portrait_(3x4_retouched,_cropped).jpg",
@@ -325,16 +325,16 @@
 "file": "img/159f20851d7faf.webp"
 },
 {
-"source": "https://commons.wikimedia.org/wiki/File:Hugh_Laurie,_from_a_bit_of_Fry_%26_Laurie,_http---en.wikipedia.org-wiki-Hugh_laurie_(9450843901)_(cropped).jpg",
-"author": "Jeroen Komen from Utrecht, Netherlands",
-"licence": "CC BY-SA 2.0",
-"file": "img/236c45992af867.webp"
-},
-{
 "source": "https://commons.wikimedia.org/wiki/File:Il_cratere_del_Vulcano_-_panoramio.jpg",
 "author": "pietro scerrato",
 "licence": "CC BY 3.0",
 "file": "img/e360fb3b3a4c7e.webp"
+},
+{
+"source": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_(adjusted_levels).jpg",
+"author": "Leonardo da Vinci",
+"licence": "Public domain",
+"file": "img/ebd4b6446c7283.webp"
 },
 {
 "source": "https://commons.wikimedia.org/wiki/File:Michelangelo_-_Creation_of_Adam_(cropped).jpg",
@@ -459,12 +459,6 @@
 "file": "img/289ddcf4bfb3a7.webp"
 },
 {
-"source": "https://commons.wikimedia.org/wiki/File:Lions_signed_ball.jpg",
-"author": "Hamedog",
-"licence": "CC BY-SA 3.0",
-"file": "img/f160a605fd8631.webp"
-},
-{
 "source": "https://commons.wikimedia.org/wiki/File:Pyramids_of_the_Giza_Necropolis.jpg",
 "author": "KennyOMG",
 "licence": "CC BY-SA 4.0",
@@ -481,6 +475,12 @@
 "author": "Alexander Bassano",
 "licence": "Public domain",
 "file": "img/22629aaea1bef7.webp"
+},
+{
+"source": "https://commons.wikimedia.org/wiki/File:Rugby_ball_webb_ellis.png",
+"author": "Hamedog",
+"licence": "CC BY-SA 4.0",
+"file": "img/f160a605fd8631.webp"
 },
 {
 "source": "https://commons.wikimedia.org/wiki/File:Sphinx_with_the_third_pyramid.jpg",
@@ -631,10 +631,10 @@
 "file": "img/d5b2a6e5625734.webp"
 },
 {
-"source": "https://commons.wikimedia.org/wiki/File:Male_cheetah_facing_left_in_South_Africa.jpg",
-"author": "AfricanConservation",
+"source": "https://commons.wikimedia.org/wiki/File:Puma_(Puma_concolor_concolor)_female_Leona_Amarga_6.jpg",
+"author": "Charles J. Sharp",
 "licence": "CC BY-SA 4.0",
-"file": "img/fe202a32756079.webp"
+"file": "img/1a30c78cbd0aac.webp"
 },
 {
 "source": "https://commons.wikimedia.org/wiki/File:RStonesHydePark030722_(49_of_125)_(52193656268)_(cropped).jpg",
@@ -667,6 +667,12 @@
 "file": "img/f06ed1dbea8634.webp"
 },
 {
+"source": "https://commons.wikimedia.org/wiki/File:Yamaha_Saxophone_YTS-62.tif",
+"author": "Yamaha Corporation",
+"licence": "CC BY-SA 4.0",
+"file": "img/9a5fc495f5a3f4.webp"
+},
+{
 "source": "https://commons.wikimedia.org/wiki/File:Yamaha_Tenor_trombone_YSL-891Z_(re-crop).jpg",
 "author": "Yamaha Corporation",
 "licence": "CC BY-SA 4.0",
@@ -677,12 +683,6 @@
 "author": "Yamaha Corporation",
 "licence": "CC BY-SA 4.0",
 "file": "img/2bc556ed81138f.webp"
-},
-{
-"source": "https://commons.wikimedia.org/wiki/File:Yamaha_YAS-25_Alto_Saxophone_20080502.jpg",
-"author": "TR001",
-"licence": "CC BY-SA 3.0",
-"file": "img/9a5fc495f5a3f4.webp"
 }
 ]
 }

@@ -9,12 +9,13 @@
 <title>Oddball · Photo credits</title>
 <link rel="icon" href="icons/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=0bfb2293">
 <style>
 .credits{padding:12px 14px calc(var(--safe-bottom) + 20px);line-height:1.4;font-size:14.5px}
 .credits h2{font-size:17px;color:var(--teal);margin:18px 0 6px}
 .credits ul{margin:0;padding-left:18px}.credits li{margin:5px 0;overflow-wrap:anywhere}
 .credits a{color:var(--teal)}
+.locked{color:var(--muted);margin:4px 0}
 .back{display:inline-block;margin-top:4px;font-weight:700;color:var(--teal);text-decoration:none}
 </style>
 </head>
@@ -22,14 +23,16 @@
 <header class="top"><div class="brand"><span class="logo" aria-hidden="true"><i></i><i></i><i class="o"></i><i></i></span><h1>Oddball</h1></div><div class="sub">Photo credits</div></header>
 <main class="credits">
 <a class="back" href="./">&#8249; Back to the puzzle</a>
-<p>All photos come from Wikimedia Commons and are in the public domain or under Creative Commons licences. They have been cropped and resized. Credits are grouped by puzzle day; days still to come are hidden.</p>
+<p>All photos come from Wikimedia Commons and are in the public domain or under Creative Commons licences. They have been cropped and resized. Credits are grouped by puzzle day. To avoid spoilers, a day's credits appear once you've finished that day's puzzle.</p>
 <div id="list">Loading…</div>
 </main>
 <script>
 (async()=>{
   const q=new URLSearchParams(location.search);
   const london=()=>{try{const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const g=t=>p.find(x=>x.type===t).value;return `${g('year')}-${g('month')}-${g('day')}`;}catch(e){return new Date().toISOString().slice(0,10);}};
-  const today=(q.get('test')==='1'&&q.get('today'))||london();
+  const TEST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)&&q.get('test')==='1';
+  const today=(TEST&&q.get('today'))||london();
+  const done=d=>{try{const s=JSON.parse(localStorage.getItem((TEST?'obtest-':'ob-')+d)||'null');return !!(s&&s.done);}catch(e){return false;}};
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const C=await (await fetch('credits.json',{cache:'no-cache'})).json();
   const D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -37,7 +40,7 @@
   const days=Object.keys(C).filter(d=>d<=today).sort().reverse();
   const L=document.getElementById('list');
   if(!days.length){L.textContent='No photos yet.';return;}
-  L.innerHTML=days.map(d=>`<h2>${nice(d)}</h2><ul>${C[d].map(c=>`<li><a href="${esc(c.source)}" rel="noopener">${esc(decodeURIComponent(c.source.split('File:')[1]||c.source).replace(/_/g,' '))}</a> by ${esc(c.author||'unknown')}, ${esc(c.licence)}</li>`).join('')}</ul>`).join('');
+  L.innerHTML=days.map(d=>!done(d)?`<h2>${nice(d)}</h2><p class="locked">Finish this day's puzzle to see its photo credits. (They name the pictures.)</p>`:`<h2>${nice(d)}</h2><ul>${C[d].map(c=>`<li><a href="${esc(c.source)}" rel="noopener">${esc(decodeURIComponent(c.source.split('File:')[1]||c.source).replace(/_/g,' '))}</a> by ${esc(c.author||'unknown')}, ${esc(c.licence)}</li>`).join('')}</ul>`).join('');
 })();
 </script>
 </body>

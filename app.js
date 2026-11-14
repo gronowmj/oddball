@@ -3,7 +3,8 @@
 'use strict';
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
-const TEST = params.get('test') === '1';
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const TEST = LOCAL && params.get('test') === '1';   // test hooks only work on a local server
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const ROUNDS = 10;
@@ -29,12 +30,6 @@ const hex = b => Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');
 function decode(salt,id,x){
   const enc=Uint8Array.from(atob(x),c=>c.charCodeAt(0)); let key=[]; let i=0;
   while(key.length<enc.length){ key=key.concat(Array.from(sha256(`${salt}|${id}|${i}`))); i++; }
-  return String.fromCharCode(...enc.map((b,j)=>b^key[j]));
-}
-
-function decode(salt,id,x){
-  const enc=Uint8Array.from(atob(x),c=>c.charCodeAt(0)); let key=[]; let i=0;
-  while(key.length<enc.length){ key=key.concat(Array.from(sha256(`${salt}|${id}|${i}`))); i++; }
   return new TextDecoder().decode(enc.map((b,j)=>b^key[j]));
 }
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -51,7 +46,7 @@ const dayNo = (d,epoch) => Math.round((Date.parse(d)-Date.parse(epoch))/864e5)+1
 
 // ---- state ----
 let IDX, P, SEC=[], S, avail=[];
-const skey = d => 'ob-'+d;
+const skey = d => (TEST?'obtest-':'ob-')+d;   // test mode never touches real saves
 const load = d => { try{ return JSON.parse(localStorage.getItem(skey(d))||'null'); }catch(e){ return null; } };
 function save(){ try{ localStorage.setItem(skey(P.date), JSON.stringify(S)); }catch(e){} }
 const score = () => S.picks.reduce((n,p,i)=>n+(p!==null&&p===SEC[i].o?1:0),0);
@@ -62,7 +57,7 @@ function show(id){ ['#game','#results','#empty'].forEach(v=>$(v).hidden = v!==id
 async function boot(){
   bind();
   IDX = await (await fetch('puzzles/index.json',{cache:'no-cache'})).json();
-  const today = todayIso();
+  const today = todayIso(); bootDay=today;
   avail = IDX.dates.filter(d=>d<=today);
   const want = params.get('date') || today;
   window.__ob = {today, avail, ready:false};
@@ -78,15 +73,28 @@ async function boot(){
   P = await (await fetch(`puzzles/${want}.json`,{cache:'no-cache'})).json();
   SEC = P.rounds.map(r=>JSON.parse(decode(P.salt,r.id,r.x)));
   $('#puzzleTitle').innerHTML = `No. ${P.no}<br>${nice(P.date)}`;
+  if(P.date!==today && avail.includes(today)){ $('#todayBar').hidden=false; document.body.classList.add('archiveday'); }
   document.title = `Oddball No. ${P.no}`;
-  S = load(P.date);
-  if(!S || !Array.isArray(S.picks) || S.picks.length!==P.rounds.length) S = {picks:Array(P.rounds.length).fill(null), idx:0, done:false};
+  S = restore(load(P.date));
   if(S.done) showResults(); else renderRound();
   window.__ob.date=P.date; window.__ob.ready=true; window.__ob.state=()=>JSON.parse(JSON.stringify(S));
 }
 
+// A save keeps each round's content fingerprint; a pick only counts if that round is unchanged.
+function restore(st){
+  const fp=P.rounds.map(r=>r.f), n=P.rounds.length;
+  const fresh={picks:Array(n).fill(null), idx:0, done:false, fp};
+  if(!st || !Array.isArray(st.picks) || st.picks.length!==n || !Array.isArray(st.fp)) return fresh;
+  let changed=false;
+  st.picks=st.picks.map((p,i)=>{ const ok=st.fp[i]===fp[i] && (p===null || (Number.isInteger(p)&&p>=0&&p<4)); if(!ok&&p!==null) changed=true; return ok?p:null; });
+  st.fp=fp;
+  if(!Number.isInteger(st.idx) || st.idx<0 || st.idx>=n) st.idx=0;
+  if(changed || (st.done && st.picks.includes(null))){ st.done=false; delete st.score; const j=st.picks.indexOf(null); st.idx=j<0?n-1:j; }
+  if(!st.done && st.picks.every(p=>p!==null) && st.idx===n-1 && st.picks[n-1]!==null){ /* answered last round, Next not pressed */ }
+  return st;
+}
 function wordSize(t){ const n=t.length, longest=Math.max(...t.split(' ').map(w=>w.length));
-  if(n<=7 && longest<=7) return 's1'; if(n<=11 && longest<=9) return 's2'; if(n<=18 && longest<=11) return 's3'; return 's4'; }
+  if(n<=7 && longest<=7) return 's1'; if(n<=11 && longest<=9) return 's2'; if(n<=18 && longest<=10) return 's3'; return 's4'; }
 
 function renderDots(){
   const D=$('#dots'); D.innerHTML='';
@@ -104,7 +112,8 @@ function renderRound(){
     const b=document.createElement('button'); b.className='tile '+(t.img?'pic':'word'); b.dataset.k=k;
     if(t.img){ b.innerHTML=`<img src="${esc(t.img)}" alt="Picture ${k+1}" width="480" height="480" decoding="async" draggable="false"><span class="cap"></span><span class="tag"></span>`; b.setAttribute('aria-label',`Picture ${k+1}`); }
     else { b.innerHTML=`<span class="w ${wordSize(t.text)}">${esc(t.text)}</span><span class="tag"></span>`; }
-    b.addEventListener('click',()=>pick(k));
+    b.addEventListener('click',()=>{ if(b.classList.contains('failed')&&S.picks[i]===null){ retryImg(b,t.img,true); return; } pick(k); });
+    if(t.img){ const im=b.querySelector('img'); im.addEventListener('error',()=>retryImg(b,t.img,false)); im.addEventListener('load',()=>b.classList.remove('failed')); }
     G.appendChild(b);
   });
   $('#prompt').textContent = 'Which is the odd one out?';
@@ -113,7 +122,14 @@ function renderRound(){
   else { $('#fbText').innerHTML='<span class="hint">Tap the tile that doesn\'t belong.</span>'; $('#nextBtn').disabled=true; }
   preload(i+1);
 }
-function preload(i){ const r=P.rounds[i]; if(!r) return; r.tiles.forEach(t=>{ if(t.img){ const im=new Image(); im.src=t.img; } }); }
+// preload every remaining image of the day, so a dropped connection mid-game doesn't break later rounds
+const preloaded={};
+function preload(from){ for(let i=from;i<P.rounds.length;i++) P.rounds[i].tiles.forEach(t=>{ if(t.img&&!preloaded[t.img]){ const im=new Image(); im.src=t.img; preloaded[t.img]=im; } }); }
+function retryImg(b,src,manual){
+  const im=b.querySelector('img'); const tries=Number(b.dataset.tries||0);
+  if(!manual && tries>=1){ b.classList.add('failed'); return; }
+  b.dataset.tries=tries+1; b.classList.remove('failed'); im.src=src+'?r='+Date.now();
+}
 
 function pick(k){
   const i=S.idx; if(S.picks[i]!==null) return;
@@ -131,15 +147,16 @@ function reveal(fresh){
   const oddName = sec.l ? sec.l[sec.o] : P.rounds[i].tiles[sec.o].text;
   $('#fbText').innerHTML = ok ? `<b class="ok">Correct!</b><span>${esc(oddName)} is the odd one out.</span>`
                               : `<b class="no">Not this time</b><span>The odd one out was ${esc(oddName)}.</span>`;
-  const last = i===P.rounds.length-1;
+  const last = S.picks.every(p=>p!==null);
   const nb=$('#nextBtn'); nb.textContent = last ? 'See results' : 'Next round'; nb.disabled=false;
   renderDots();
   if(fresh && navigator.vibrate) try{ navigator.vibrate(ok?15:[20,40,20]); }catch(e){}
 }
 function next(){
   const i=S.idx; if(S.picks[i]===null) return;
-  if(i>=P.rounds.length-1){ S.done=true; S.score=score(); save(); showResults(); return; }
-  S.idx=i+1; save(); renderRound();
+  let j=S.picks.indexOf(null,i+1); if(j<0) j=S.picks.indexOf(null);
+  if(j<0){ S.done=true; S.score=score(); save(); showResults(); return; }
+  S.idx=j; save(); renderRound();
 }
 
 const VERDICTS=['Tough day!','Tough day!','Tough day!','Not bad','Not bad','Good effort','Good effort','Sharp eye','Excellent','Superb','Perfect!'];
@@ -179,10 +196,18 @@ function showArchive(){
     else if(st && st.picks && st.picks.some(x=>x!==null)) tag='In progress';
     if(st && st.done && st.score!==undefined) tag=`${st.score} / 10`;
     b.innerHTML=`<span class="dn">Oddball No. ${dayNo(d,IDX.epoch)} · ${nice(d)}</span> <span>${tag}</span>`;
-    b.onclick=()=>{ const u=new URL(location.href); u.searchParams.set('date',d); location.href=u.toString(); }; L.appendChild(b); });
+    b.onclick=()=>goDate(d); L.appendChild(b); });
   open('#archive');
 }
+function goDate(d){ const u=new URL(location.href); if(d===todayIso()) u.searchParams.delete('date'); else u.searchParams.set('date',d); location.href=u.toString(); }
+// 12: if the app is resumed on a new London day (and showing "today"), reload to get the new puzzle
+let bootDay=null;
+function checkNewDay(){ if(bootDay && !params.get('date') && todayIso()!==bootDay) location.reload(); }
 function bind(){
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkNewDay(); });
+  window.addEventListener('pageshow',checkNewDay); window.addEventListener('focus',checkNewDay);
+  setInterval(checkNewDay,60000);
+  $('#todayBtn').onclick=()=>goDate(todayIso());
   $('#nextBtn').addEventListener('click',next);
   $('#moreBtn').onclick=()=>open('#moreMenu');
   $('#archiveBtn').onclick=showArchive; $('#archiveBtn2').onclick=showArchive; $('#emptyArchive').onclick=showArchive;
@@ -197,5 +222,5 @@ function bind(){
     else if(ev.key==='Enter' && !$('#nextBtn').disabled){ next(); ev.preventDefault(); }
   });
 }
-boot().catch(err=>{ console.error(err); $('#emptyTitle').textContent='Something went wrong'; $('#emptyText').textContent='Could not load the puzzle. Please try again.'; show('#empty'); });
+boot().catch(err=>{ console.error(err); $('#emptyArchive').hidden=!avail.length; $('#emptyTitle').textContent='Something went wrong'; $('#emptyText').textContent='Could not load the puzzle. Please try again.'; show('#empty'); });
 })();

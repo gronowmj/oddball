@@ -14,7 +14,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=0bfb2293">
 </head>
 <body>
 <header class="top">
@@ -22,6 +22,7 @@
   <div class="hright"><div class="sub" id="puzzleTitle"></div><button id="moreBtn" class="round" aria-label="Menu">&middot;&middot;&middot;</button></div>
 </header>
 
+<div class="todaybar" id="todayBar" hidden>You're playing an archive day. <button id="todayBtn">Back to today</button></div>
 <section id="game" class="view" hidden>
   <div class="progress">
     <div class="rlabel" id="roundLabel">Round 1 of 10</div>
@@ -70,13 +71,13 @@
 </div>
 <div class="sheet center" id="help" hidden>
   <div class="card"><h2>How to play</h2>
-    <p>Each day has ten rounds. Every round shows four tiles: pictures, words or both.</p>
+    <p>Each day has ten rounds. Every round shows four tiles: pictures or words. Names appear on the pictures once you've tapped.</p>
     <p>Three tiles share a connection. Tap the one that doesn't belong. You get one tap per round, and there's no timer.</p>
     <p>The rounds get harder as you go. At the end you'll see your score and how every round worked.</p>
     <p>Your progress is saved on this device.</p>
     <div class="row"><button class="cancel primary">Got it</button></div></div>
 </div>
 <div class="toast" id="toast" hidden></div>
-<script src="app.js"></script>
+<script src="app.js?v=d77ab1db"></script>
 </body>
 </html>
